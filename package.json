@@ -9,7 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "latest",
+    "@coinbase/onchainkit": "^0.31.0",
     "@remix-run/react": "latest",
     "@sveltejs/kit": "latest",
     "@vercel/analytics": "latest",
@@ -23,7 +23,6 @@
     "svelte": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "latest",
     "vue": "latest",
     "vue-router": "latest"
   },

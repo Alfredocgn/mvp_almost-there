@@ -3,10 +3,8 @@ import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
 import { Suspense } from "react"
-import { OnchainKitProvider } from "@coinbase/onchainkit"
-import { base } from "viem/chains"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Treasure Hunt - Base Mini App",
@@ -22,20 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Suspense fallback={<div>Loading...</div>}>
-          <OnchainKitProvider
-            apiKey="RapNJ0ankst9y4YwMY10XjQYlgvRUl24"
-            chain={base}
-            config={{
-              appearance: {
-                mode: "auto",
-                theme: "base",
-              },
-            }}
-          >
-            {children}
-          </OnchainKitProvider>
-        </Suspense>
+        <Suspense fallback={null}>{children}</Suspense>
         <Analytics />
       </body>
     </html>
