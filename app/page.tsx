@@ -6,43 +6,15 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  Wallet,
-  Users,
-  MapPin,
-  Coins,
-  Timer,
-  Zap,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Eye,
-  ArrowLeft,
-  Flag,
-} from "lucide-react"
+import { Wallet, Users, Clock, Zap, ZoomIn, ZoomOut, ArrowLeft, Eye, MapPin } from "lucide-react"
 
-// Mock wallet connection hook
-function useWallet() {
-  const [isConnected, setIsConnected] = useState(false)
-  const [address, setAddress] = useState<string | null>(null)
-  const [isConnecting, setIsConnecting] = useState(false)
-
-  const connectWallet = async () => {
-    setIsConnecting(true)
-    // Simulate wallet connection
-    setTimeout(() => {
-      setIsConnected(true)
-      setAddress("0x1234...5678")
-      setIsConnecting(false)
-    }, 1500)
-  }
-
-  const disconnectWallet = () => {
-    setIsConnected(false)
-    setAddress(null)
-  }
-
-  return { isConnected, address, isConnecting, connectWallet, disconnectWallet }
+const mockGameData = {
+  playersNeeded: 6,
+  currentPlayers: 3,
+  gameStartsIn: 120, // seconds
+  playerTurns: 5,
+  mapSize: "50x50",
+  prizePool: "0.5 ETH",
 }
 
 function TreasureMap({
@@ -865,7 +837,7 @@ function TreasureMap({
         <div className="flex items-center justify-between bg-card rounded-lg p-4">
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="font-mono">
-              <Timer className="w-4 h-4 mr-1" />
+              <Clock className="w-4 h-4 mr-1" />
               {formatTime(300)} {/* Placeholder for game time left */}
             </Badge>
             <Badge variant="secondary">
@@ -873,7 +845,7 @@ function TreasureMap({
               {playerTurns} turns left
             </Badge>
             <Badge variant="outline">
-              <Flag className="w-4 h-4 mr-1" />
+              <MapPin className="w-4 h-4 mr-1" />
               {totalFlags} submitted | {cartSize} in cart
             </Badge>
             <Badge variant={selectedMainSquare ? "default" : "secondary"}>
@@ -914,7 +886,7 @@ function TreasureMap({
                 setMapPosition({ x: 0, y: 0 })
               }}
             >
-              <RotateCcw className="w-4 h-4" />
+              <Zap className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -977,17 +949,10 @@ function TreasureMap({
   )
 }
 
-const mockGameData = {
-  playersNeeded: 6,
-  currentPlayers: 3,
-  gameStartsIn: 120, // seconds
-  playerTurns: 5,
-  mapSize: "50x50",
-  prizePool: "0.5 ETH",
-}
-
 export default function TreasureHuntGame() {
-  const { isConnected, address, isConnecting, connectWallet, disconnectWallet } = useWallet()
+  const [isConnected, setIsConnected] = useState(false)
+  const [address, setAddress] = useState("")
+  const [isConnecting, setIsConnecting] = useState(false)
   const [gameTimer, setGameTimer] = useState(mockGameData.gameStartsIn)
   const [gameState, setGameState] = useState<"lobby" | "playing">("lobby")
   const [playerTurns, setPlayerTurns] = useState(mockGameData.playerTurns)
@@ -1026,55 +991,55 @@ export default function TreasureHuntGame() {
     setGameTimer(0)
   }
 
+  const connectWallet = async () => {
+    setIsConnecting(true)
+    // Simulate connection delay
+    setTimeout(() => {
+      setIsConnected(true)
+      setAddress("0x1234...5678")
+      setIsConnecting(false)
+    }, 1000)
+  }
+
+  const disconnectWallet = () => {
+    setIsConnected(false)
+    setAddress("")
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <header className="border-b bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-              <MapPin className="w-6 h-6 text-accent-foreground" />
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-amber-600 to-orange-600 rounded-lg flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Treasure Hunt</h1>
-              <p className="text-sm text-muted-foreground">Base Miniapp</p>
+              <h1 className="text-3xl font-bold text-amber-900">Buenos Aires Treasure Hunt</h1>
+              <p className="text-amber-700">Discover the secrets of the city</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-4">
+          <div className="flex items-center space-x-4">
             {isConnected && (
               <Badge variant="secondary" className="px-3 py-1">
                 <Wallet className="w-4 h-4 mr-2" />
                 {address}
               </Badge>
             )}
-            <Button
-              onClick={isConnected ? disconnectWallet : connectWallet}
-              disabled={isConnecting}
-              variant={isConnected ? "outline" : "default"}
-              className="min-w-[140px]"
-            >
-              {isConnecting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  Connecting...
-                </>
-              ) : isConnected ? (
-                <>
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Disconnect
-                </>
-              ) : (
-                <>
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Connect Wallet
-                </>
-              )}
-            </Button>
+            {!isConnected ? (
+              <Button onClick={connectWallet} disabled={isConnecting} className="min-w-[140px]">
+                <Wallet className="w-4 h-4 mr-2" />
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={disconnectWallet} className="min-w-[140px] bg-transparent">
+                <Wallet className="w-4 h-4 mr-2" />
+                Disconnect
+              </Button>
+            )}
           </div>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-8">
         {!isConnected ? (
           <div className="max-w-md mx-auto">
             <Card className="text-center">
@@ -1084,25 +1049,16 @@ export default function TreasureHuntGame() {
                 </div>
                 <CardTitle className="text-2xl">Connect Your Wallet</CardTitle>
                 <CardDescription>
-                  Connect your Base or MetaMask wallet to join the treasure hunt adventure
+                  Connect your Coinbase Wallet to join the treasure hunt adventure on Base
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Button onClick={connectWallet} disabled={isConnecting} className="w-full" size="lg">
-                  {isConnecting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                      Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <Wallet className="w-5 h-5 mr-2" />
-                      Connect Wallet
-                    </>
-                  )}
+                  <Wallet className="w-5 h-5 mr-2" />
+                  {isConnecting ? "Connecting..." : "Connect Coinbase Wallet"}
                 </Button>
                 <p className="text-sm text-muted-foreground">
-                  Supports MetaMask, Coinbase Wallet, and other Base-compatible wallets
+                  This Base mini app works seamlessly with Coinbase Wallet
                 </p>
               </CardContent>
             </Card>
@@ -1110,8 +1066,8 @@ export default function TreasureHuntGame() {
         ) : gameState === "playing" ? (
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-foreground mb-2">The Hunt Begins!</h2>
-              <p className="text-muted-foreground">Click on the map to place your marks and find the hidden treasure</p>
+              <h2 className="text-3xl font-bold text-amber-900 mb-2">The Hunt Begins!</h2>
+              <p className="text-amber-700">Click on the map to place your marks and find the hidden treasure</p>
             </div>
 
             <TreasureMap
@@ -1124,8 +1080,8 @@ export default function TreasureHuntGame() {
         ) : (
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-foreground mb-2">Welcome to the Hunt!</h2>
-              <p className="text-muted-foreground">Join other treasure hunters in an epic multiplayer adventure</p>
+              <h2 className="text-3xl font-bold text-amber-900 mb-2">Welcome to the Hunt!</h2>
+              <p className="text-amber-700">Join other treasure hunters in an epic multiplayer adventure</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -1147,7 +1103,7 @@ export default function TreasureHuntGame() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Game starts in</span>
                     <Badge variant="outline" className="font-mono">
-                      <Timer className="w-4 h-4 mr-1" />
+                      <Clock className="w-4 h-4 mr-1" />
                       {formatTime(gameTimer)}
                     </Badge>
                   </div>
@@ -1155,7 +1111,7 @@ export default function TreasureHuntGame() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Prize Pool</span>
                     <Badge variant="secondary" className="text-accent">
-                      <Coins className="w-4 h-4 mr-1" />
+                      <Zap className="w-4 h-4 mr-1" />
                       {mockGameData.prizePool}
                     </Badge>
                   </div>
@@ -1204,7 +1160,7 @@ export default function TreasureHuntGame() {
                     </div>
 
                     <Button variant="outline" className="w-full bg-transparent">
-                      <Coins className="w-4 h-4 mr-2" />
+                      <Zap className="w-4 h-4 mr-2" />
                       Buy More Turns
                     </Button>
                   </div>
@@ -1241,7 +1197,7 @@ export default function TreasureHuntGame() {
             </Card>
           </div>
         )}
-      </main>
+      </div>
     </div>
   )
 }
